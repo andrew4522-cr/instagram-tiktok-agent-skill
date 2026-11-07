@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "instagram-tiktok-agent-skill"
+version = "1.0.0"
+description = "Run an Entire Instagram Reels & TikTok Channel with 11 AI Agent Skills (21 Hook Formulas, Cover+Hook Alignment, Transcript Cut Lists, Retention Drop-Off Doctor, Viral Clipper & Faceless Studio)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Andrew Anderson", email = "andrew@cult.rent" }
+]
+keywords = ["instagram-reels", "tiktok", "agent-skills", "claude-skills", "short-form-video", "content-automation", "viral-hooks"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://www.bridgingtheaigap.com"
+Repository = "https://github.com/andrew4522-cr/instagram-tiktok-agent-skill"
+
+[project.scripts]
+ig-tiktok-skill = "instagram_tiktok_skill.engine:main"
