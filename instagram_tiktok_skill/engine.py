@@ -311,10 +311,123 @@ def diagnose_retention_dropoff(
     }
 
 
+def generate_carousel_deck(
+    topic: str,
+    hook_headline: str,
+    rehook_slide2: str,
+    value_points: List[str],
+    cta_keyword: str = "GUIDE",
+    aspect_ratio: str = "4:5 (1080x1350)",
+) -> Dict[str, Any]:
+    """
+    Skill 07: Carousel & TikTok Photo Mode Architect (High-Save Educational Decks).
+    Builds and audits an 8-slide high-save deck engineered for:
+      - Slide 1: Scroll-Stopper Cover Hook (<= 10 words + numeric/contrast anchor + swipe cue)
+      - Slide 2: Instagram 2nd-Impression Re-Hook (stands alone when IG re-serves Slide 2 in feed)
+      - Slides 3-7: Single-Idea Educational Cards (<= 35 words/slide + micro-open-loop footer)
+      - Slide 8: Double Conversion Lockup (Bookmark/Save trigger + ManyChat Comment-to-DM keyword)
+    """
+    points = list(value_points[:5])
+    while len(points) < 5:
+        points.append(f"Step {len(points) + 1}: Execute the core {topic} framework with measurable proof.")
+
+    hook_words = len(hook_headline.split())
+    rehook_words = len(rehook_slide2.split())
+    has_number = bool(re.search(r"\d+", hook_headline + " " + rehook_slide2))
+
+    slides: List[Dict[str, Any]] = [
+        {
+            "slide": 1,
+            "role": "Primary Scroll-Stopper Cover",
+            "headline": hook_headline.strip(),
+            "subhead": f"The complete {topic} breakdown (Swipe ->)",
+            "word_count": hook_words,
+            "design_rule": "Center inside 1:1 grid safe zone; 64pt serif/display headline; high-contrast focal image.",
+        },
+        {
+            "slide": 2,
+            "role": "Instagram 2nd-Impression Re-Hook & Core Tension",
+            "headline": rehook_slide2.strip(),
+            "body": f"Most people get {topic} wrong before they even start. Here is what the data actually shows.",
+            "footer_loop": "First, fix the #1 hidden bottleneck ->",
+            "word_count": rehook_words + 16,
+            "design_rule": "Must work as a standalone cover when Instagram re-serves Slide 2 to non-swipers.",
+        },
+    ]
+
+    micro_loops = [
+        "But that only works if you get Step 2 right ->",
+        "Here is where the real leverage kicks in ->",
+        "And this next shift changes the math completely ->",
+        "Which leads to the most memorable part ->",
+        "Here is how to lock this in today ->",
+    ]
+
+    max_slide_words = 0
+    for idx, pt in enumerate(points):
+        slide_num = idx + 3
+        parts = pt.split(":", 1)
+        if len(parts) == 2:
+            card_title = parts[0].strip()
+            card_body = parts[1].strip()
+        else:
+            card_title = f"0{idx + 1} · Key Pillar"
+            card_body = pt.strip()
+        wc = len((card_title + " " + card_body).split())
+        max_slide_words = max(max_slide_words, wc)
+        slides.append({
+            "slide": slide_num,
+            "role": f"Value Pillar {idx + 1} of 5",
+            "headline": card_title,
+            "body": card_body,
+            "footer_loop": micro_loops[idx],
+            "word_count": wc,
+            "design_rule": "Max 35 words per card for 2.8s TikTok Photo Mode auto-advance readability.",
+        })
+
+    clean_kw = re.sub(r"[^A-Za-z0-9_-]", "", cta_keyword).upper() or "GUIDE"
+    slides.append({
+        "slide": 8,
+        "role": "High-Save & ManyChat DM Conversion Lockup",
+        "headline": "Save This Deck for Later 🔖",
+        "body": f"Comment '{clean_kw}' below and we will DM you the direct {topic} link & private checklist.",
+        "cta_keyword": clean_kw,
+        "word_count": 21,
+        "design_rule": "Pair Bookmark icon (top-right / bottom-right cue) with bold highlighted comment keyword pill.",
+    })
+
+    score = 70.0
+    feedback: List[str] = []
+    if 3 <= hook_words <= 10:
+        score += 10.0
+    else:
+        feedback.append(f"Slide 1 headline has {hook_words} words; target 4-10 punchy words.")
+    if has_number:
+        score += 10.0
+    else:
+        feedback.append("Add a concrete number, metric, or timeframe to Slide 1 or Slide 2 to boost save intent.")
+    if max_slide_words <= 35:
+        score += 10.0
+    else:
+        feedback.append(f"One or more body slides exceed 35 words (max={max_slide_words}); tighten for TikTok Photo Mode.")
+
+    return {
+        "topic": topic,
+        "aspect_ratio": aspect_ratio,
+        "slide_count": len(slides),
+        "save_ability_score": round(min(100.0, score), 1),
+        "instagram_second_impression_ready": rehook_words >= 5,
+        "tiktok_photo_mode_pacing_ok": max_slide_words <= 35,
+        "cta_keyword": clean_kw,
+        "feedback": feedback,
+        "slides": slides,
+    }
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="ig-tiktok-skill",
-        description="Instagram Reels & TikTok 11-Skill Agent Engine (Hook Scorer, Cover Alignment, Cut List, Retention Doctor)",
+        description="Instagram Reels & TikTok 11-Skill Agent Engine (Hook Scorer, Cover Alignment, Cut List, Retention Doctor, Carousel Architect)",
     )
     parser.add_argument("--list-formulas", action="store_true", help="List all 21 viral Reels & TikTok hook formulas")
     parser.add_argument("--score-hook", metavar="SAID_HOOK", help="Score a 0-3s spoken hook (0-100)")
@@ -323,6 +436,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--check-alignment", nargs=3, metavar=("COVER_HEADLINE", "COVER_VISUAL", "SPOKEN_HOOK"), help="Check Cover + Hook alignment as a set")
     parser.add_argument("--cut-list", metavar="RAW_TRANSCRIPT", help="Generate a timestamped editing cut list from a raw transcript")
     parser.add_argument("--diagnose-retention", nargs=3, type=float, metavar=("HOLD_3S_PCT", "AVG_WATCH_PCT", "COMPLETION_PCT"), help="Diagnose viewer drop-off points")
+    parser.add_argument("--carousel", nargs=4, metavar=("TOPIC", "SLIDE1_HOOK", "SLIDE2_REHOOK", "CTA_KEYWORD"), help="Generate an 8-slide High-Save Carousel & TikTok Photo Mode deck")
+    parser.add_argument("--points", nargs="*", default=[], help="Up to 5 value points ('Title: Body') for --carousel")
 
     args = parser.parse_args(argv)
 
@@ -344,6 +459,11 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if args.diagnose_retention:
         print(json.dumps(diagnose_retention_dropoff(*args.diagnose_retention), indent=2))
+        return 0
+
+    if args.carousel:
+        topic, s1, s2, kw = args.carousel
+        print(json.dumps(generate_carousel_deck(topic, s1, s2, args.points, kw), indent=2))
         return 0
 
     parser.print_help()

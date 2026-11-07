@@ -4,6 +4,7 @@ from instagram_tiktok_skill import (
     HOOK_FORMULAS_21,
     check_cover_and_hook_alignment,
     diagnose_retention_dropoff,
+    generate_carousel_deck,
     generate_transcript_cut_list,
     score_shortform_hook,
 )
@@ -62,6 +63,26 @@ class TestInstagramTiktokAgentSkill(unittest.TestCase):
         diag = diagnose_retention_dropoff(hold_3s_pct=48.0, avg_watch_pct=35.0, completion_pct=15.0)
         self.assertEqual(len(diag["diagnoses"]), 3)
         self.assertEqual(diag["diagnoses"][0]["severity"], "CRITICAL")
+
+    def test_carousel_architect_generates_8_slides(self):
+        deck = generate_carousel_deck(
+            topic="Valencia Singles Retreat",
+            hook_headline="24 Vetted Singles. 1 Spanish Estate. 72 Hours.",
+            rehook_slide2="Why 75% of Applicants Are Rejected Before Getting the Villa Address",
+            value_points=[
+                "Strict Vetting: ID check + 12-minute Zoom vibe check locks 12 men & 12 women.",
+                "Private Suites: Choose Solo En-Suite, Twin En-Suite, or Boutique Annex.",
+                "Day 1 Phones Off: Phones go into a wooden lockbox at sunset tapas.",
+                "Day 2 Thermal Springs: 25C Montanejos canyon waters trigger 2.4x attraction.",
+                "Day 3 Real Chemistry: 38% rebook or refer a friend within 30 days.",
+            ],
+            cta_keyword="VILLA",
+        )
+        self.assertEqual(deck["slide_count"], 8)
+        self.assertEqual(deck["save_ability_score"], 100.0)
+        self.assertTrue(deck["instagram_second_impression_ready"])
+        self.assertTrue(deck["tiktok_photo_mode_pacing_ok"])
+        self.assertEqual(deck["cta_keyword"], "VILLA")
 
 
 if __name__ == "__main__":
